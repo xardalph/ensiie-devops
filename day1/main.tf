@@ -1,31 +1,14 @@
 
-resource "random_pet" "pet" {
-  prefix = "dev"
-  separator = "-"
+module "pet_fleet" {
+  source = "./modules/pet_fleet"
+  fleet_size = 10
 }
 
-resource "local_file" "foo" {
- lifecycle {
-  precondition {
-      condition     = random_pet.pet.prefix == "dev"
-      error_message = "pet prefix should be dev"
-    }
-  precondition {
-      condition     = random_pet.pet.separator == "-"
-      error_message = "pet separator should be '-'"
-    }
-    postcondition {
-      condition     = self.content == "${random_pet.pet.id}\n"
-      error_message = "wrong file content"
-    }
- }
-  content  = "${random_pet.pet.id}\n"
-  file_permission = "0640"
-  filename = "./dist/pet.txt"
+module "script_runner" {
+  source = "./modules/script_runner"
+  files_names = module.pet_fleet.pet_name
 }
 
-output "pet_name" {
-  value = random_pet.pet.id
+output "p" {
+  value =  { v = module.pet_fleet.pet_name }
 }
-
-
