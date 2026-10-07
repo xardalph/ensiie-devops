@@ -1,0 +1,25 @@
+services:
+  web:
+    container_name: frontend
+    restart: always
+    build: ./
+    ports:
+      - 3000:3000
+    environment: 
+      - REDIS_HOST=redis
+# This is not useful as it's already defined in the Dockerfile.
+#    healthcheck: 
+#      test: ["CMD", "httpcheck", "localhost:3000"]
+#      interval: 5s
+#      timeout: 10s
+#      retries: 3
+  redis:
+    container_name: redis
+    restart: always
+    # I don't expose port for redis: this is an internal tool used by web, not something our users should be able to access directly
+    image: redis:7
+    volumes:
+      - redis_storage:/data
+
+volumes:
+  redis_storage:
