@@ -10,13 +10,24 @@ COPY main.go .
 #RUN go build  -v -o /usr/local/bin/app ./...
 RUN go build --ldflags '-linkmode external -extldflags "-static"' -v -o /usr/local/bin/app ./...
 
-FROM scratch AS runner
+FROM builder AS dev 
+RUN go install github.com/air-verse/air@latest
+
+COPY main.go .
+COPY public public
+COPY air.toml .
+
+EXPOSE 3000
+CMD ["air", "-c", "air.toml"]
+
+
+FROM scratch AS prod
 COPY --from=builder /usr/local/bin/app /usr/local/bin/app
 COPY --from=builder /usr/bin/curl /usr/bin/curl
 
 # smaller healtchcheck from https://github.com/tarampampam/microcheck
-COPY --from=ghcr.io/tarampampam/microcheck:1 /bin/httpcheck /bin/httpcheck
-HEALTHCHECK --interval=5s --timeout=3s --retries=3 CMD ["httpcheck", "http://localhost:3000/"]
+#COPY --from=ghcr.io/tarampampam/microcheck:1 /bin/httpcheck /bin/httpcheck
+#HEALTHCHECK --interval=5s --timeout=3s --retries=3 CMD ["httpcheck", "http://localhost:3000/"]
 COPY public public
 
 EXPOSE 3000
