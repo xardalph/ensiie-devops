@@ -6,7 +6,12 @@ WORKDIR /usr/src/app
 COPY go.mod go.sum ./
 RUN go mod download
 
-COPY . .
-RUN go build -v -o /usr/local/bin/app ./...
+COPY public public
+COPY main.go .
+RUN go build  -v -o /usr/local/bin/app ./...
+#RUN go build --ldflags '-linkmode external -extldflags "-static"' -v -o /usr/local/bin/app ./...
 
+EXPOSE 3000
+RUN useradd -ms /bin/bash  goapp
+USER goapp
 CMD ["app"]
