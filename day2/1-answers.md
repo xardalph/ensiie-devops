@@ -28,5 +28,6 @@ avec ldflags lors du build :
    ldd /usr/local/bin/app 
 	not a dynamic executable
 ```
+- multistage de l'image en utilisant scratch comme image finale. taille de l'image à cette étape : 15.8MB.
 
 ### Ce que j'ai appris

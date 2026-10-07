@@ -1,4 +1,4 @@
-FROM golang:latest
+FROM golang:latest AS builder
 
 WORKDIR /usr/src/app
 
@@ -6,12 +6,14 @@ WORKDIR /usr/src/app
 COPY go.mod go.sum ./
 RUN go mod download
 
-COPY public public
 COPY main.go .
-RUN go build  -v -o /usr/local/bin/app ./...
-#RUN go build --ldflags '-linkmode external -extldflags "-static"' -v -o /usr/local/bin/app ./...
+#RUN go build  -v -o /usr/local/bin/app ./...
+RUN go build --ldflags '-linkmode external -extldflags "-static"' -v -o /usr/local/bin/app ./...
+
+FROM scratch AS runner
+COPY --from=builder /usr/local/bin/app /usr/local/bin/app
+
+COPY public public
 
 EXPOSE 3000
-RUN useradd -ms /bin/bash  goapp
-USER goapp
-CMD ["app"]
+CMD ["/usr/local/bin/app"]
