@@ -1,0 +1,10 @@
+services:
+  web:
+    container_name: rust
+    build:
+      context: ./
+      target: ${ENV_STATUS:-dev}
+    ports:
+      - 3001:3001
+    volumes:
+      - ./:/app
